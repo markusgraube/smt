@@ -36,6 +36,11 @@
     	<artifactId>jgraphx</artifactId>
     	<version>3.1.2.1</version>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-io</artifactId>
+    	<version>1.3.2</version>
+    </dependency>
   </dependencies>
   <description>SPARQL Model Transformator
 Graphical Transformation engine allowing to transform Linked Data models using SPARQL</description>
