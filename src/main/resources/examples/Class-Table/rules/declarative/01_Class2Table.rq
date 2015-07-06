@@ -10,12 +10,12 @@ INSERT {
         [] c:c _:c, _:t;
             c:columnPrefix "".
     }
-    GRAPH <graph://table> {
+    GRAPH <graph://right> {
         _:t  a tm:Table;
             tm:name ?name.
 #             tm:name ?t_name.
     }
-    GRAPH <graph://class> {
+    GRAPH <graph://left> {
         _:c a cm:Class;
             cm:name ?name;
 #             cm:name ?c_name;

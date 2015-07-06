@@ -50,8 +50,8 @@ public class ApplicationUI {
 
 	public DefaultMutableTreeNode model_tree_node;
 	public DefaultMutableTreeNode tree_node_rules;
-	private JTree tree_model;
-	private JTree tree_rules;
+	public JTree tree_model;
+	public JTree tree_rules;
 	
 	/**
 	 * Create the application UI
@@ -184,8 +184,10 @@ public class ApplicationUI {
 		panel_rule.add(lblNewLabel_2, BorderLayout.NORTH);
 		
 		tree_rules = new JTree();
+		tree_rules.setSelectionRow(1);
 		tree_node_rules = new DefaultMutableTreeNode("Rulesets");
 		tree_rules.setModel(new DefaultTreeModel(tree_node_rules));
+		tree_rules.expandPath(new TreePath(tree_node_rules.getPath()));
 		panel_rule.add(tree_rules, BorderLayout.EAST);
 		
 		JPanel panel_current_rule = new JPanel();

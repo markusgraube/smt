@@ -10,6 +10,7 @@ public class Rule {
 	public String transformationQuery;
 	public String label;
 	public RuleSet ruleSet;
+	public RuleType type;
 	
 	
 	public Rule(File file) {

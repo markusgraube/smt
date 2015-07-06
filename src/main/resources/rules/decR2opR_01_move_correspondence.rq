@@ -3,7 +3,7 @@ PREFIX sp: <http://spinrdf.org/sp#>
 PREFIX  list:  <http://jena.hpl.hp.com/ARQ/list#>
 
 
-# Move left graph to WHERE clause
+# Move right graph to WHERE clause
 
 DELETE {
 # delete graph from INSERT clause
@@ -26,7 +26,7 @@ WHERE{
         sp:where ?where_first_item.
     ?insertList list:member ?graph.
     ?graph a sp:NamedGraph;
-        sp:graphNameNode <graph://left>.
+        sp:graphNameNode <graph://correspondence>.
 
     ?graph_element rdf:first ?graph;
         rdf:rest ?element_successor.

@@ -60,6 +60,7 @@ public class Controller {
 		rules.put(new_rule.label, new_rule);
 		current_rule = new_rule;
 		form.tree_node_rules.add(new DefaultMutableTreeNode(new_rule.label));
+		form.tree_rules.expandPath(form.tree_rules.getPathForRow(form.tree_rules.getRowCount()));
 	}
 	
 	

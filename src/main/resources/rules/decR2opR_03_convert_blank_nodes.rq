@@ -7,12 +7,11 @@ PREFIX  list:  <http://jena.hpl.hp.com/ARQ/list#>
 INSERT{
     ?b sp:varName ?newVarName.
 }
-# SELECT DISTINCT  ?a ?p ?b ?newVarName
 WHERE{
     [] sp:where ?wherePattern.
         ?wherePattern (rdf:first|rdf:rest|sp:elements)*/(sp:subject|sp:predicate|sp:object) ?b.
         FILTER (isBlank(?b))
         FILTER NOT EXISTS {?b ?p1 ?o1}
-    LET (?newVarName := str(md5(str(rand()))))
-}
+    BIND( str(md5(str(rand()))) AS ?newVarName )
 
+}

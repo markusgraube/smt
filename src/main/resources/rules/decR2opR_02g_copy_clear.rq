@@ -15,19 +15,19 @@ DELETE{
 WHERE{
     {
         ?s a c:Mark.
-        LET ( ?p := rdf:type)
-        LET ( ?o := c:Mark)
+        BIND( rdf:type AS ?p )
+        BIND( c:Mark AS ?o )
     }
     UNION
     {
         ?s a c:Copy.
-        LET ( ?p := rdf:type)
-        LET ( ?o := c:Copy)
+        BIND( rdf:type AS ?p )
+        BIND( c:Copy AS ?o )
     }
     UNION
     {
         ?s c:ref ?o.
-        LET ( ?p := c:ref)
+        BIND( c:ref AS ?p )
     }
     
 }

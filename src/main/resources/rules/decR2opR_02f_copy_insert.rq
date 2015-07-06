@@ -17,14 +17,14 @@ WHERE{
         ?minus a sp:Minus;
             sp:elements/rdf:rest* ?minus_last_item.
             ?minus_last_item rdf:rest rdf:nil.
-            LET (?p := rdf:rest)
+            BIND(rdf:rest AS ?p)
     }
     UNION
     {
         ?minus a sp:Minus;
             sp:elements rdf:nil.
-        LET (?minus_last_item := ?minus)
-        LET (?p := sp:elements)
+        BIND( ?minus AS ?minus_last_item)
+  		BIND( sp:elements AS ?p)
     }
 }
 

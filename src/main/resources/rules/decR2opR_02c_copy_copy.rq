@@ -16,6 +16,7 @@ INSERT{
 # SELECT DISTINCT  *
 WHERE{
     ?item a c:Mark.
-    LET (?item_new := if(isBlank(?item), bnode(), ?item))
+    #LET(?item_new := if(isBlank(?item), bnode(), ?item))
+    BIND ( if(isBlank(?item), bnode(), ?item) AS ?item_new)
 }
 
