@@ -3,6 +3,9 @@
  */
 package de.tud.plt.smt;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.BeforeClass;
 
 import de.tud.plt.smt.controller.DeclarativeRuleTransformator;
@@ -27,7 +30,8 @@ public class TestDeclarativeRuleTransformator extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		a = new DeclarativeRuleTransformator("examples/Class-Table/rules/declarative/01_Class2Table.rq");
+		File f =  new File("src/main/resources/examples/Class-Table/rules/declarative/01_Class2Table.rq");
+		a = new DeclarativeRuleTransformator(f);
 	}
 
 	/* (non-Javadoc)
@@ -39,9 +43,10 @@ public class TestDeclarativeRuleTransformator extends TestCase {
 
 	/**
 	 * Test method for {@link de.tud.plt.smt.controller.DeclarativeRuleTransformator#DeclarativeRuleTransformator(java.lang.String)}.
+	 * @throws IOException 
 	 */
-	public final void testDeclarativeRuleTransformator() {
-		fail("Not yet implemented"); // TODO
+	public final void testDeclarativeRuleTransformator() throws IOException {
+		a.generateOperationalRules("test/");
 	}
 
 	/**

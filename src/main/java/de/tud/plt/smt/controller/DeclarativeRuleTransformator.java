@@ -1,8 +1,10 @@
 package de.tud.plt.smt.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.topbraid.spin.arq.ARQ2SPIN;
@@ -28,31 +30,28 @@ public class DeclarativeRuleTransformator {
 	private static Logger logger = Logger.getLogger(DeclarativeRuleTransformator.class);
 	
 	private String declarativeRule; 
+	private String ruleName;
 	
-	private final String rule1_forward  =  "rules/decR2opR_01_move_forward.rq";
-	private final String rule1_backward  =  "rules/decR2opR_01_move_backward.rq";
-	private final String rule1_cc  =  "rules/decR2opR_01_move_correspondence.rq";
-	private final String rule2a =  "rules/decR2opR_02a_copy_start.rq";
-	private final String rule2b =  "rules/decR2opR_02b_copy_markAll.rq";
-	private final String rule2c =  "rules/decR2opR_02c_copy_copy.rq";
-	private final String rule2d =  "rules/decR2opR_02d_copy_connect.rq";
-	private final String rule2e =  "rules/decR2opR_02e_copy_literals.rq";
-	private final String rule2f =  "rules/decR2opR_02f_copy_insert.rq";
-	private final String rule2g =  "rules/decR2opR_02g_copy_clear.rq";
-	private final String rule3  =  "rules/decR2opR_03_convert_blank_nodes.rq";
-	
-	private final String rule4  =  "rules/decR2opR_04_convert_Modify_to_Ask.rq";
+	private final String rule_move_left  =  "rules/decR2opR_01_move_forward.rq";
+	private final String rule_move_right  =  "rules/decR2opR_01_move_backward.rq";
+	private final String rule_move_correspondence  =  "rules/decR2opR_01_move_correspondence.rq";
+	private final String rule_copy_1_start =  "rules/decR2opR_02a_copy_start.rq";
+	private final String rule_copy_2_markAll =  "rules/decR2opR_02b_copy_markAll.rq";
+	private final String rule_copy_3_copy =  "rules/decR2opR_02c_copy_copy.rq";
+	private final String rule_copy_4_connect =  "rules/decR2opR_02d_copy_connect.rq";
+	private final String rule_copy_5_literals =  "rules/decR2opR_02e_copy_literals.rq";
+	private final String rule_copy_6_insert =  "rules/decR2opR_02f_copy_insert.rq";
+	private final String rule_copy_7_clear =  "rules/decR2opR_02g_copy_clear.rq";
+	private final String rule_convert_blank_nodes  =  "rules/decR2opR_03_convert_blank_nodes.rq";
+	private final String rule_modify_to_ask  =  "rules/decR2opR_04_convert_Modify_to_Ask.rq";
     
 	private final Model model = ModelFactory.createDefaultModel();
 	
-
-	
-	
-	
-	public DeclarativeRuleTransformator(final String declarativeRulePath)
+	public DeclarativeRuleTransformator(final File declarativeRuleFile)
 	{
+		ruleName =declarativeRuleFile.getName(); 
 		try {
-			this.declarativeRule = IOUtils.toString(ClassLoader.getSystemResourceAsStream(declarativeRulePath));
+			declarativeRule = FileUtils.readFileToString(declarativeRuleFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,6 +73,10 @@ public class DeclarativeRuleTransformator {
 	}
 
 	/**
+	 * Executes SPARQL query on SPIN model of declarative rule
+	 * 
+	 * @param model SPIN model of query
+	 * @param queryPath path of SPARQL query
 	 * @throws IOException
 	 */
 	private void transform(Model model, String queryPath) throws IOException {
@@ -110,19 +113,34 @@ public class DeclarativeRuleTransformator {
 		model.write(System.out, "TURTLE");
 	}
 	
+	
+	public void generateOperationalRules(String path) throws IOException{
+		File fPath = new File(path);
+		if (!fPath.exists())
+			fPath.mkdirs();
+		
+		String forward_rule = this.transformToLeft2Right();
+		FileUtils.writeStringToFile(new File(path+"/operational/forward/"+ruleName), forward_rule);
+		String backward_rule = this.transformToRight2Left();
+		FileUtils.writeStringToFile(new File(path+"/operational/backward/"+ruleName), backward_rule);
+		String correspondence_rule = this.transformToCorrespondenceCheck();
+		FileUtils.writeStringToFile(new File(path+"/operational/correspondence/"+ruleName), correspondence_rule);
+	}
+	
+	
 	public String transformToLeft2Right(){
 		Model modelL2R = ModelFactory.createDefaultModel();
 		modelL2R.add(model);
 		try {
-			transform(modelL2R, rule1_forward);	
-		    transform(modelL2R, rule2a);
-		    transform(modelL2R, rule2b);
-		    transform(modelL2R, rule2c);
-		    transform(modelL2R, rule2d);
-		    transform(modelL2R, rule2e);
-		    transform(modelL2R, rule2f);
-		    transform(modelL2R, rule2g);
-		    transform(modelL2R, rule3);
+			transform(modelL2R, rule_move_left);	
+		    transform(modelL2R, rule_copy_1_start);
+		    transform(modelL2R, rule_copy_2_markAll);
+		    transform(modelL2R, rule_copy_3_copy);
+		    transform(modelL2R, rule_copy_4_connect);
+		    transform(modelL2R, rule_copy_5_literals);
+		    transform(modelL2R, rule_copy_6_insert);
+		    transform(modelL2R, rule_copy_7_clear);
+		    transform(modelL2R, rule_convert_blank_nodes);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,15 +153,15 @@ public class DeclarativeRuleTransformator {
 		Model modelR2L = ModelFactory.createDefaultModel();
 		modelR2L.add(model);
 		try {
-			transform(modelR2L, rule1_backward);
-		    transform(modelR2L, rule2a);
-		    transform(modelR2L, rule2b);
-		    transform(modelR2L, rule2c);
-		    transform(modelR2L, rule2d);
-		    transform(modelR2L, rule2e);
-		    transform(modelR2L, rule2f);
-		    transform(modelR2L, rule2g);
-		    transform(modelR2L, rule3);
+			transform(modelR2L, rule_move_right);
+		    transform(modelR2L, rule_copy_1_start);
+		    transform(modelR2L, rule_copy_2_markAll);
+		    transform(modelR2L, rule_copy_3_copy);
+		    transform(modelR2L, rule_copy_4_connect);
+		    transform(modelR2L, rule_copy_5_literals);
+		    transform(modelR2L, rule_copy_6_insert);
+		    transform(modelR2L, rule_copy_7_clear);
+		    transform(modelR2L, rule_convert_blank_nodes);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -155,12 +173,11 @@ public class DeclarativeRuleTransformator {
 		Model modelCC = ModelFactory.createDefaultModel();
 		modelCC.add(model);
 		try {
-			transform(modelCC, rule1_forward);	
-			transform(modelCC, rule1_backward);	
-			transform(modelCC, rule1_cc);	
-			
-		    transform(modelCC, rule4);
-		    transform(modelCC, rule3);
+			transform(modelCC, rule_move_left);	
+			transform(modelCC, rule_move_right);	
+			transform(modelCC, rule_move_correspondence);	
+		    transform(modelCC, rule_modify_to_ask);
+		    transform(modelCC, rule_convert_blank_nodes);
 		    debugGraphStore(modelCC);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -25,6 +25,7 @@ public class App
         controller.addModel(new File(path + "CAE-HMI/models/hmi_example1.ttl"));
         
         controller.addModel(new File(path + "Class-Table/models/class_instances.ttl"));
+        controller.addModel(new File(path + "Class-Table/models/class_instances_simple.ttl"));
         
         controller.addRule(new File(path + "CAE-HMI/rules/01.rq"));
         controller.addRule(new File(path + "Class-Table/rules/manual/class2table/01_Class2Table.rq"));

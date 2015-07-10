@@ -72,7 +72,7 @@ public class ApplicationUI {
         JButton b_transform = new JButton("Transform");
         JButton b_save_rule = new JButton("Save Rule");
 		JButton b_load_rule = new JButton("Load Rule");
-
+		JButton b_clear = new JButton("Clear Canvas");
 		
         b_save_model.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
@@ -102,6 +102,11 @@ public class ApplicationUI {
 				graphPanel.updateGraph();
 			}
 		});
+        b_clear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				graphPanel.clear();
+			}
+		});
         b_transform.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				controller.transform();
@@ -122,6 +127,9 @@ public class ApplicationUI {
         vertical.add(b_add_model);
         vertical.add(b_save_model);
         vertical.add(b_load_model);
+        vertical.add(b_clear);
+        
+        
         vertical.add(Box.createHorizontalGlue());
         vertical.add(b_transform);
         vertical.add(Box.createHorizontalGlue());

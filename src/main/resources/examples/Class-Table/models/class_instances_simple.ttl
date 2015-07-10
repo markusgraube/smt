@@ -1,0 +1,12 @@
+@prefix cm: <http://comvantage.eu/graph-trans/class/m#> .
+@prefix ci: <http://comvantage.eu/graph-trans/class/i#> .
+
+ci:c1 a cm:Class;
+    cm:name "Order";
+    cm:is_persistent true;
+    cm:attrs ci:att1.
+
+ci:att1 a cm:Attribute;
+    cm:name "order_no";
+    cm:is_primary true;
+    cm:type ci:i.
