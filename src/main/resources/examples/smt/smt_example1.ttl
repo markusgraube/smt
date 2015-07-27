@@ -1,0 +1,9 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix smt: <http://eatld.et.tu-dresden.de/smt/> .
+@prefix ex: <http://eatld.et.tu-dresden.de/example/> .
+
+ex:smt_example1 a smt:TransformationModel;
+	rdfs:label "SMT Example Transformation Model 1";
+	rdfs:description "Example for transforming classes into tables";
+	smt:lhs_file "class_instances.ttl".

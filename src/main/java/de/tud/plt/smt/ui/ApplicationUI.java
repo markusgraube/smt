@@ -2,13 +2,13 @@ package de.tud.plt.smt.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -23,27 +23,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.tud.plt.smt.controller.Controller;
 import de.tud.plt.smt.controller.DeclarativeRuleTransformator;
 import de.tud.plt.smt.model.Rule;
 import de.tud.plt.smt.model.TransformationModel;
-import java.awt.Component;
-import javax.swing.border.TitledBorder;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JDesktopPane;
-import java.awt.FlowLayout;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 
 public class ApplicationUI {

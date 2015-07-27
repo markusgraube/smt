@@ -38,9 +38,9 @@ public class GraphPanel extends mxGraphComponent {
 			
 		// define layout
 	    layout = new mxFastOrganicLayout(graph);
-//	    layout.setForceConstant(200); // the higher, the more separated
+	    layout.setForceConstant(100); // the higher, the more separated
 //		layout.setDisableEdgeStyle(true); 
-		layout.setMinDistanceLimit(25);
+//		layout.setMinDistanceLimit(100);
 //		layout.setMaxDistanceLimit(35);  
 		
 		

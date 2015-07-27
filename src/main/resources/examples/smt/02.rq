@@ -1,0 +1,50 @@
+PREFIX cm: <http://comvantage.eu/graph-trans/class/m#>
+PREFIX tm: <http://comvantage.eu/graph-trans/table/m#>
+PREFIX c: <http://comvantage.eu/graph-trans/correspondence#>
+
+# class2table
+# primitive attributes to columns for classes
+# works even for non-persistent child classes or associated classes due to connectNonPersistentClassesWithTables
+
+INSERT {
+    GRAPH <graph://CS> {
+        _:ct1 c:c ?a, _:col.
+    }
+    GRAPH <graph://RHS> {
+        ?t tm:cols _:col.
+        _:col a tm:Column;
+            tm:name ?col_name;
+            tm:type ?col_type.
+    }
+}
+WHERE {
+    GRAPH <graph://LHS> {
+        ?c a cm:Class;
+            cm:attrs ?a.
+        ?a a cm:Attribute;
+            cm:type ?p;
+            cm:name ?a_name.
+        ?p a cm:PrimitiveDataType;
+            cm:name ?p_name.
+    }
+    GRAPH <graph://CS> {
+        ?ct c:c ?c, ?t;
+            c:columnPrefix ?ct_columnPrefix.
+    }
+    GRAPH <graph://RHS> {
+         ?t a tm:Table.
+    }
+    BIND ( concat(?ct_columnPrefix,?a_name) AS ?col_name )
+    BIND ( ?p_name AS ?col_type )
+    MINUS { 
+        GRAPH <graph://CS> {
+            ?ct1 c:c ?a, ?col.
+        }
+        GRAPH <graph://LHS> {
+            ?t tm:cols ?col.
+            ?col a tm:Column;
+                tm:name ?col_name;
+                tm:type ?col_type.
+        }
+    }
+}
