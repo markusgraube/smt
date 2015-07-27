@@ -23,15 +23,6 @@ ci:att2 a cm:Attribute;
     cm:type ci:s.
 
 
-ci:c3 a cm:Class;
-    cm:name "Address";
-    cm:is_persistent false;
-    cm:attrs ci:att3.
-    
-ci:att3 a cm:Attribute;
-    cm:name "addr";
-    cm:is_primary true;
-    cm:type ci:s.
     
 
 ci:s a cm:PrimitiveDataType;
@@ -45,7 +36,3 @@ ci:a1 a cm:Association;
     cm:src ci:c1;
     cm:dest ci:c2.
     
-ci:a2 a cm:Association;
-    cm:name "address";
-    cm:src ci:c2;
-    cm:dest ci:c3.

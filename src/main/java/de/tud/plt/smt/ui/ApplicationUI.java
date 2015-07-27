@@ -8,10 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,10 +29,21 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.tud.plt.smt.controller.Controller;
-import de.tud.plt.smt.model.LDModel;
+import de.tud.plt.smt.controller.DeclarativeRuleTransformator;
+import de.tud.plt.smt.model.Rule;
+import de.tud.plt.smt.model.TransformationModel;
+import java.awt.Component;
+import javax.swing.border.TitledBorder;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JDesktopPane;
+import java.awt.FlowLayout;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 
 public class ApplicationUI {
@@ -44,14 +55,19 @@ public class ApplicationUI {
 	private JFrame mainFrame;
 	private JTextArea jta_rdf;
 	private JTextArea jta_rule;
-	private JEditorPane editorPane; 
+	private RuleGraphPanel rule_graph_panel; 
 	private Controller controller;
-	private GraphPanel graphPanel;
+	private RDFGraphPanel rdf_graph_panel;
+	private JLabel lbl_status;
 
 	public DefaultMutableTreeNode model_tree_node;
-	public DefaultMutableTreeNode tree_node_rules;
+	public DefaultMutableTreeNode rule_tree_node;
 	public JTree tree_model;
+	
 	public JTree tree_rules;
+
+
+
 	
 	/**
 	 * Create the application UI
@@ -63,113 +79,142 @@ public class ApplicationUI {
 		mainFrame.setBounds(100, 100, 1116, 862);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		
-		JToolBar vertical = new JToolBar(SwingConstants.HORIZONTAL);
-        JButton b_add_model = new JButton("Add Model");
-        JButton b_save_model = new JButton("Save Model");
-        JButton b_load_model = new JButton("Load Model");
-        JButton b_transform = new JButton("Transform");
-        JButton b_save_rule = new JButton("Save Rule");
-		JButton b_load_rule = new JButton("Load Rule");
-		JButton b_clear = new JButton("Clear Canvas");
-		
-        b_save_model.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		try {
-        			controller.saveLHS("model_lhs.ttl");
-        		} catch (IOException e) {
-        			// TODO Auto-generated catch block
-        			e.printStackTrace();
-        		}
-        		
-        	}
-        });
-        b_add_model.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				File rdf_file = useFileChooser();
-				controller.addModel(rdf_file);
-				tree_model.updateUI();
-			}
-		});
-        b_load_model.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				TreePath b = tree_model.getSelectionPath();
-				String path = b.getLastPathComponent().toString();
-				LDModel model = controller.models.get(path);
-				controller.loadModeltoLHS(model);
-				jta_rdf.setText(model.getTurtleRepresentation());
-				graphPanel.updateGraph();
-			}
-		});
-        b_clear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				graphPanel.clear();
-			}
-		});
-        b_transform.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				controller.transform();
-				
-			}
-		});
-        b_load_rule.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				File rdf_file = chooseSPARQLRuleFile();
-				controller.addRule(rdf_file);
-				jta_rule.setText(controller.current_rule.transformationQuery);
-				editorPane.setText(controller.current_rule.transformationQuery);
-				tree_rules.updateUI();
-			}
-		});
-        
-        vertical.add(Box.createHorizontalGlue());
-        vertical.add(b_add_model);
-        vertical.add(b_save_model);
-        vertical.add(b_load_model);
-        vertical.add(b_clear);
-        
-        
-        vertical.add(Box.createHorizontalGlue());
-        vertical.add(b_transform);
-        vertical.add(Box.createHorizontalGlue());
-		vertical.add(b_save_rule);
-		vertical.add(b_load_rule);
-		vertical.add(Box.createHorizontalGlue());
 
         
 		addMenuBar();
 		mainFrame.getContentPane().setLayout(new BorderLayout(0, 0));
-		mainFrame.getContentPane().add(vertical, BorderLayout.NORTH);
+		
+		JPanel desktopPane = new JPanel();
+		mainFrame.getContentPane().add(desktopPane, BorderLayout.CENTER);
+		desktopPane.setLayout(new GridLayout(1, 2));
+		
+		JToolBar panel_rule = new JToolBar();
 		
 		
-		JPanel panel_main = new JPanel();
-		mainFrame.getContentPane().add(panel_main, BorderLayout.CENTER);
-		panel_main.setLayout(new GridLayout(0, 2, 0, 0));
+		tree_rules = new JTree();
+		tree_rules.setBorder(new TitledBorder(null, "Rulesets", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		tree_rules.setEditable(true);
+		rule_tree_node = new DefaultMutableTreeNode("Rulesets");
+		tree_rules.setModel(new DefaultTreeModel(rule_tree_node));
 		
-		JPanel panel_model = new JPanel();
-		panel_model.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panel_main.add(panel_model);
+		
+		
+		
+		
+		panel_rule.setLayout(new BorderLayout(0, 0));
+		
+		JPanel toolBar = new JPanel();
+		panel_rule.add(toolBar, BorderLayout.NORTH);
+		
+		JLabel lblNewLabel_2 = new JLabel("Rule");
+		toolBar.add(lblNewLabel_2);
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		Component horizontalGlue_1 = Box.createHorizontalGlue();
+		toolBar.add(horizontalGlue_1);
+		
+		JButton b_add_rule = new JButton("Add Rule");
+		toolBar.add(b_add_rule);
+		JButton b_load_rule = new JButton("Load Rule");
+		toolBar.add(b_load_rule);
+		JButton b_save_rule = new JButton("Save Rule");
+		toolBar.add(b_save_rule);
+		JButton b_clear_rule_canvas = new JButton("Clear Canvas");
+		toolBar.add(b_clear_rule_canvas);
+		JButton b_generate_operational_rules = new JButton("Generate Operational Rules");
+		toolBar.add(b_generate_operational_rules);
+		
+		panel_rule.add(tree_rules, BorderLayout.WEST);
+		
+		JPanel panel_current_rule = new JPanel();
+		panel_rule.add(panel_current_rule, BorderLayout.CENTER);
+		panel_current_rule.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		rule_graph_panel = new RuleGraphPanel();
+		panel_current_rule.add(rule_graph_panel);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		panel_current_rule.add(scrollPane_1);
+		
+		jta_rule = new JTextArea();
+		scrollPane_1.setViewportView(jta_rule);
+		jta_rule.setEditable(false);
+		jta_rule.setLineWrap(true);
+		jta_rule.setText("# Rule Output Area");
+		
+		
+		b_add_rule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				File rule_file = chooseSPARQLRuleFile();
+				controller.addRule(rule_file);
+				tree_rules.updateUI();
+			}
+		});
+		b_generate_operational_rules.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				File rdf_file = chooseSPARQLRuleFile();
+				DeclarativeRuleTransformator t =  new DeclarativeRuleTransformator(rdf_file);
+				try {
+					t.generateOperationalRules("test");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		b_load_rule.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				TreePath b = tree_rules.getSelectionPath();
+				String path = b.getLastPathComponent().toString();
+				Rule rule = controller.rules.get(path);
+				controller.current_rule = rule;
+				jta_rule.setText(rule.transformationQuery);
+				RuleGraphPanel a = controller.form.rule_graph_panel;
+				a.updateGraph(rule);
+			}
+		});
+		
+		JToolBar panel_model = new JToolBar();
+		desktopPane.add(panel_model);
+		desktopPane.add(panel_rule);
+		
+		tree_model = new JTree();
+		tree_model.setEditable(true);
+		tree_model.setBorder(new TitledBorder(null, "Models", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		model_tree_node = new DefaultMutableTreeNode("Models");
+		tree_model.setModel(new DefaultTreeModel(model_tree_node));
+		
+		
+		panel_model.setLayout(new BorderLayout(0, 0));
+		
+		JPanel toolBar_btn_model = new JPanel();
+		panel_model.add(toolBar_btn_model, BorderLayout.NORTH);
 		
 		
 		JLabel lblNewLabel_1 = new JLabel("Model");
+		toolBar_btn_model.add(lblNewLabel_1);
 		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		Component horizontalGlue = Box.createHorizontalGlue();
+		toolBar_btn_model.add(horizontalGlue);
 		
-		tree_model = new JTree();
-		model_tree_node = new DefaultMutableTreeNode("Models");
-		tree_model.setModel(new DefaultTreeModel(model_tree_node));		
-		tree_model.setExpandsSelectedPaths(true);
+		JButton b_add_model = new JButton("Add Model");
+		toolBar_btn_model.add(b_add_model);
+		JButton b_load_model = new JButton("Load Model");
+		toolBar_btn_model.add(b_load_model);
+		JButton b_clear = new JButton("Clear Canvas");
+		toolBar_btn_model.add(b_clear);
+		JButton b_save_model = new JButton("Save Model");
+		toolBar_btn_model.add(b_save_model);
 		
-		panel_model.setLayout(new BorderLayout(0, 0));
-		panel_model.add(lblNewLabel_1, BorderLayout.NORTH);
 		panel_model.add(tree_model, BorderLayout.WEST);
 		
 		JPanel panel_current_model = new JPanel();
 		panel_model.add(panel_current_model);
 		panel_current_model.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		graphPanel = new GraphPanel();
-		panel_current_model.add(graphPanel);
+		rdf_graph_panel = new RDFGraphPanel();
+		panel_current_model.add(rdf_graph_panel);
 		
 		
 		jta_rdf = new JTextArea();
@@ -178,48 +223,55 @@ public class ApplicationUI {
 		jta_rdf.setText("# RDF Output Area");
 		
 		JScrollPane scrp = new JScrollPane(jta_rdf,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		panel_current_model.add(scrp);
 		scrp.setPreferredSize(new Dimension(300, 150));
 		
-		JPanel panel_rule = new JPanel();
-		panel_main.add(panel_rule);
-		panel_rule.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblNewLabel_2 = new JLabel("Rule");
-		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
-		panel_rule.add(lblNewLabel_2, BorderLayout.NORTH);
+		///////////// Action Listener
+		b_add_model.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				File rdf_file = useFileChooser();
+				controller.addModel(rdf_file);
+				tree_model.updateUI();
+			}
+		});
+		b_load_model.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				TreePath b = tree_model.getSelectionPath();
+				String path = b.getLastPathComponent().toString();
+				TransformationModel model = controller.models.get(path);
+				controller.loadModel(model);
+			}
+		});
+		b_save_model.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					controller.saveLHS("model_lhs.ttl");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		b_clear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				rdf_graph_panel.clear();
+			}
+		});
 		
-		tree_rules = new JTree();
-		tree_rules.setSelectionRow(1);
-		tree_node_rules = new DefaultMutableTreeNode("Rulesets");
-		tree_rules.setModel(new DefaultTreeModel(tree_node_rules));
-		tree_rules.expandPath(new TreePath(tree_node_rules.getPath()));
-		panel_rule.add(tree_rules, BorderLayout.EAST);
-		
-		JPanel panel_current_rule = new JPanel();
-		panel_rule.add(panel_current_rule, BorderLayout.CENTER);
-		panel_current_rule.setLayout(new GridLayout(0, 1, 0, 0));
-		
-		editorPane = new JEditorPane();
-		panel_current_rule.add(editorPane);
-		
-		jta_rule = new JTextArea();
-		panel_current_rule.add(jta_rule);
-		jta_rule.setEditable(false);
-		jta_rule.setLineWrap(true);
-		jta_rule.setText("# Rule Output Area");
+
 		
 		JPanel panel_statusbar = new JPanel();
 		panel_statusbar.setBorder(new LineBorder(new Color(0, 0, 0)));
 		mainFrame.getContentPane().add(panel_statusbar, BorderLayout.SOUTH);
 		panel_statusbar.setLayout(new GridLayout(0, 1, 0, 0));
 		
-		JLabel lblNewLabel = new JLabel("Status: xyz");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		panel_statusbar.add(lblNewLabel);
-		
+		lbl_status = new JLabel("Status: xyz");
+		lbl_status.setHorizontalAlignment(SwingConstants.LEFT);
+		panel_statusbar.add(lbl_status);
 		
 		mainFrame.setVisible(true);
 	}
@@ -232,39 +284,8 @@ public class ApplicationUI {
 		JMenu mnMenu = new JMenu("Menu");
 		mnMenu.setMnemonic('M');
 		menuBar.add(mnMenu);
-		JMenuItem mntmLoadRDF = new JMenuItem("Load RDF Model");
-		JMenuItem mntmSaveRDF = new JMenuItem("Save RDF Model");
 		JMenuItem mntmExit = new JMenuItem("Exit");
-		JMenuItem mntmLoadRule = new JMenuItem("Load Rule(s)");
 		
-		mntmLoadRDF.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				File rdf_file = useFileChooser();
-				controller.addModel(rdf_file);
-				jta_rdf.setText(controller.lhs.getTurtleRepresentation());
-				graphPanel.updateGraph();
-			}
-		});
-		mntmLoadRule.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				chooseSPARQLRuleFile();
-			}
-		});
-		mntmSaveRDF.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					controller.saveLHS("model_lhs.ttl");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-			}
-		});
-		
-		mnMenu.add(mntmLoadRDF);
-		mnMenu.add(mntmSaveRDF);
-		mnMenu.add(mntmLoadRule);
 		mnMenu.add(mntmExit);
 		
 		JMenu mnEdit = new JMenu("Edit");
@@ -272,6 +293,15 @@ public class ApplicationUI {
 		
 		JMenuItem mntmProperties = new JMenuItem("Properties");
 		mnEdit.add(mntmProperties);
+		
+		JMenuItem mntmTransform = new JMenuItem("Transform");
+		mntmTransform.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					controller.transform();
+					
+				}
+			});
+		menuBar.add(mntmTransform);
 	}
 	
 	private File useFileChooser() {
@@ -303,4 +333,17 @@ public class ApplicationUI {
 	    else
 	    	return null;
 	}
+
+
+	public void update_model_visualisation() {
+		jta_rdf.setText(controller.activeModel.get_trig());
+		rdf_graph_panel.updateGraph(controller.activeModel);
+	}
+
+
+	public void update_rule_visualisation() {
+		jta_rule.setText(controller.current_rule.transformationQuery);
+		rule_graph_panel.updateGraph(controller.current_rule);
+	}
+	
 }

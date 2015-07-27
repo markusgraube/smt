@@ -1,41 +1,38 @@
 package de.tud.plt.smt.ui;
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
-
-import de.tud.plt.smt.controller.Controller;
-import de.tud.plt.smt.model.LDModel;
+import com.mxgraph.view.mxStylesheet;
 
 public class GraphPanel extends mxGraphComponent {
 
-	/** The logger */
-	private static Logger logger = Logger.getLogger(GraphPanel.class);
-	
-	private static final int NODE_HEIGHT = 20;
-	private static final int NODE_WIDTH = 100;
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4099161978657241049L;
-	private mxGraph graph;
-	private mxFastOrganicLayout layout;
-	private mxGraphModel model;
+	private static final long serialVersionUID = -6686987563806502720L;
+
+	protected mxGraph graph;
+	protected mxFastOrganicLayout layout;
+	protected mxGraphModel model;
 	
-	public GraphPanel(){
+	
+	public GraphPanel() {
 		super(new mxGraph());
 		graph = this.getGraph();
 		graph.setMultigraph(true);
 		graph.setAllowDanglingEdges(false);
-		graph.setCellsEditable(false);
+		graph.setCellsEditable(true);
+		graph.setAutoSizeCells(true);
+		graph.setEdgeLabelsMovable(false);
+		graph.setGridEnabled(true);
+		graph.setExtendParentsOnAdd(true);
+		
+		
 		
 		model = (mxGraphModel) graph.getModel();
 			
@@ -45,13 +42,40 @@ public class GraphPanel extends mxGraphComponent {
 //		layout.setDisableEdgeStyle(true); 
 		layout.setMinDistanceLimit(25);
 //		layout.setMaxDistanceLimit(35);  
-	    
+		
+		
+		mxStylesheet smt_stylesheet =  new mxStylesheet();
+		graph.setStylesheet(smt_stylesheet);
+		
+		Map<String, Object> style_literal = new HashMap<String, Object>();
+		style_literal.put("shape", "rectangle");
+		style_literal.put("fontBold", true);
+//		style_literal.put("rounded", true);
+//		style_literal.put("fillColor", "#999999");
+//		style_literal.put("fontColor", "red");
+		smt_stylesheet.putCellStyle("literal", style_literal);
+		
+		Map<String, Object> style_node = new HashMap<String, Object>();
+		style_node.put("shape", "ellipse");
+//		style_node.put("fillColor", "#128949");
+//		style_node.put("fontColor", "black");
+		smt_stylesheet.putCellStyle("resource", style_node);
+
+		
+		Map<String, Object> style_named_graph = new HashMap<String, Object>();
+		style_named_graph.put("fillColor", "white");
+		style_named_graph.put("fontColor", "black");
+		smt_stylesheet.putCellStyle("named_graph", style_named_graph);
+		
+		
 		this.setConnectable(false);
 		this.setToolTips(false);
 		this.setLocation(0, 0);	
 		this.setVisible(true);
+		
+		this.setAutoExtend(true);
 	}
-	
+
 	public void clear() {
 		model.beginUpdate();
 		model.clear();
@@ -59,57 +83,4 @@ public class GraphPanel extends mxGraphComponent {
 		this.updateUI();
 	}
 	
-	public void updateGraph() {
-		Object parent = graph.getDefaultParent();
-		
-		LDModel ld_model = Controller.get().lhs;
-		Model rdf_model = ld_model.getJenaModel();
-		
-		StmtIterator ito = rdf_model.listStatements();
-		while (ito.hasNext()) {
-			model.beginUpdate();
-			Statement st = ito.next();
-			Resource r_sub = st.getSubject();
-			RDFNode r_obj = st.getObject();
-			Object sub = model.getCell(r_sub.toString());
-			Object obj = model.getCell(r_obj.toString());			
-			if (sub==null){
-				String label = getNodeLabel(rdf_model, r_sub);
-				String id = r_sub.toString();
-				sub = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT);
-				logger.info("New Vertex: " + id + " (" + label +")");
-			}
-			if (obj==null){
-				String label = getNodeLabel(rdf_model, r_obj);
-				String id = r_obj.toString();
-				obj = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT);
-				logger.info("New Vertex: " + id + " (" + label +")");
-			}
-			String label = getNodeLabel(rdf_model, st.getPredicate());
-			graph.insertEdge(parent, st.toString(), label, sub, obj);
-			logger.info("New Edge: " + sub + "->" + obj + " ("+label+")");
-			model.endUpdate();
-		}
-		
-		layout.execute(parent);
-		
-	}
-
-	/**
-	 * @param rdf_model
-	 * @param r_obj
-	 * @return
-	 */
-	private String getNodeLabel(Model rdf_model, RDFNode r_obj) {
-		String label;
-		if (r_obj.isResource())
-			label = rdf_model.qnameFor(r_obj.toString());
-		else if (r_obj.isLiteral())
-			label = r_obj.asLiteral().getString();
-		else
-			label = "none";
-		return label;
-	}
-	
-
 }

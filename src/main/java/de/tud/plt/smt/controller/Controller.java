@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-import de.tud.plt.smt.model.LDModel;
+import de.tud.plt.smt.model.TransformationModel;
 import de.tud.plt.smt.model.Rule;
 import de.tud.plt.smt.ui.ApplicationUI;
 
@@ -24,12 +24,10 @@ public class Controller {
 	private static Controller controller;
 
 	public DataSetInMemory ds;
-	public LDModel lhs =  null;
-	public LDModel rhs =  null;
-	public LDModel cs =  null;
-	
+	public TransformationModel activeModel = null;
+
 	public Rule current_rule =  null;
-	public HashMap<String, LDModel> models = new HashMap<String, LDModel>();
+	public HashMap<String, TransformationModel> models = new HashMap<String, TransformationModel>();
 	public HashMap<String, Rule> rules = new HashMap<String, Rule>();
 	
 	public ApplicationUI form;
@@ -37,6 +35,7 @@ public class Controller {
 	private Controller() {
 		logger.info("Create controller");
 		ds = new DataSetInMemory();	
+		activeModel = new TransformationModel(ds, "active", "graph://LHS", "graph://CS", "graph://RHS");
 	}
 	
 	
@@ -47,39 +46,32 @@ public class Controller {
 	}
 	
 	
-	public LDModel addModel(File file) {
-		LDModel new_model =  new LDModel(file);
+	public TransformationModel addModel(File file) {
+		TransformationModel new_model =  new TransformationModel(file, ds);
 		models.put(new_model.label, new_model);	
 		form.model_tree_node.add(new DefaultMutableTreeNode(new_model.label));		
 		return new_model;
 	}
 	
 	
-	public void addRule(File file) {
+	public Rule addRule(File file) {
 		Rule new_rule = new Rule(file);
 		rules.put(new_rule.label, new_rule);
 		current_rule = new_rule;
-		form.tree_node_rules.add(new DefaultMutableTreeNode(new_rule.label));
+		form.rule_tree_node.add(new DefaultMutableTreeNode(new_rule.label));
 		form.tree_rules.expandPath(form.tree_rules.getPathForRow(form.tree_rules.getRowCount()));
+		form.tree_rules.updateUI();
+		form.update_rule_visualisation();	
+		return new_rule;
 	}
 	
 	
-	public void loadModeltoLHS(LDModel model) {
-		lhs = model;
-		String sparql_query = String.format("CLEAR GRAPH <graph://LHS>; COPY <%s> TO <graph://LHS>", model.graphName);
-		ds.executeUpdateQuery(sparql_query);
-	}
-	
-	public void loadModeltoRHS(LDModel model) {
-		rhs = model;
-		String sparql_query = String.format("COPY <%s> TO <RHS>", model.graphName);
-		ds.executeUpdateQuery(sparql_query);
-	}
-	
-	public void loadModeltoCS(LDModel model) {
-		cs = model;
-		String sparql_query = String.format("COPY <%s> TO <CS>", model.graphName);
-		ds.executeUpdateQuery(sparql_query);
+	public void loadModel(TransformationModel model) {
+		ds.addNamedModel(activeModel.lhs_graphName, model.get_lhs());
+		ds.addNamedModel(activeModel.cs_graphName, model.get_cs());
+		ds.addNamedModel(activeModel.rhs_graphName, model.get_rhs());
+		activeModel.pm = model.pm;
+		form.update_model_visualisation();		
 	}
 	
 	public void saveLHS(String path) throws IOException {
@@ -97,19 +89,11 @@ public class Controller {
 
 
 	public void transform() {
-		ds.executeUpdateQuery("INSERT DATA { GRAPH <test> { <a> <b> <c> }}");
+		activeModel.pm.setNsPrefixes(current_rule.pm);
+		ds.executeUpdateQuery(current_rule.transformationQuery);
 		logger.info("Sparql transformation performed");
+		form.update_model_visualisation();
 		
 	}
 	
-	public void transform(String lhs_graph, String rhs_graph) {
-		transform(lhs_graph, rhs_graph, "");
-	}
-	
-	public void transform(String lhs_graph, String rhs_graph, String cs_graph) {
-		
-		String query = current_rule.transformationQuery.replaceAll("LHS", lhs_graph);
-		query= query.replaceAll("RHS", rhs_graph);
-		query= query.replaceAll("CS", cs_graph);
-	}
 }

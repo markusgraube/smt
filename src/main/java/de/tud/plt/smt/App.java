@@ -4,6 +4,7 @@ package de.tud.plt.smt;
 import java.io.File;
 
 import de.tud.plt.smt.controller.Controller;
+import de.tud.plt.smt.model.TransformationModel;
 import de.tud.plt.smt.ui.ApplicationUI;
 
 /**
@@ -19,17 +20,20 @@ public class App
         controller.form = ui;
         String path = System.getProperty("user.dir")+"/src/main/resources/examples/";
         
-        controller.addModel(new File(path + "CAE-HMI/models/hmi_meta.ttl"));
-        controller.addModel(new File(path + "CAE-HMI/models/cae_meta.ttl"));
-        controller.addModel(new File(path + "CAE-HMI/models/cae_example1.ttl"));
-        controller.addModel(new File(path + "CAE-HMI/models/hmi_example1.ttl"));
-        
-        controller.addModel(new File(path + "Class-Table/models/class_instances.ttl"));
-        controller.addModel(new File(path + "Class-Table/models/class_instances_simple.ttl"));
-        
-        controller.addRule(new File(path + "CAE-HMI/rules/01.rq"));
-        controller.addRule(new File(path + "Class-Table/rules/manual/class2table/01_Class2Table.rq"));
-        controller.addRule(new File(path + "Class-Table/rules/manual/class2table/02_AttributesWithPrimitiveDatatype.rq"));
+        TransformationModel a = controller.addModel(new File(path + "smt/smt_example1.ttl"));
+        controller.loadModel(a);
+//        controller.addModel(new File(path + "CAE-HMI/models/hmi_meta.ttl"));
+//        controller.addModel(new File(path + "CAE-HMI/models/cae_meta.ttl"));
+//        controller.addModel(new File(path + "CAE-HMI/models/cae_example1.ttl"));
+//        controller.addModel(new File(path + "CAE-HMI/models/hmi_example1.ttl"));
+//        
+//        controller.addModel(new File(path + "Class-Table/models/class_instances.ttl"));
+//        controller.addModel(new File(path + "Class-Table/models/class_instances_simple.ttl"));
+//        
+//        controller.addRule(new File(path + "CAE-HMI/rules/01.rq"));
+        controller.addRule(new File(path + "smt/01.rq"));
+        controller.addRule(new File(path + "smt/02.rq"));
+        //controller.addRule(new File(path + "Class-Table/rules/manual/class2table/02_AttributesWithPrimitiveDatatype.rq"));
      
     }
 }

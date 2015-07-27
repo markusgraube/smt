@@ -1,3 +1,4 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX cm: <http://comvantage.eu/graph-trans/class/m#>
 PREFIX tm: <http://comvantage.eu/graph-trans/table/m#>
 PREFIX c: <http://comvantage.eu/graph-trans/correspondence#>
@@ -32,5 +33,5 @@ WHERE {
                 tm:name ?t_name.
         }
     }
-    LET (?t_name := ?c_name)
+    BIND ( ?c_name AS ?t_name )
 }
