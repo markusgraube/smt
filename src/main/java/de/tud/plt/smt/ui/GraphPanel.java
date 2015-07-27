@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mxgraph.layout.mxFastOrganicLayout;
+import com.mxgraph.layout.mxGraphLayout;
 import com.mxgraph.model.mxGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
@@ -17,7 +18,7 @@ public class GraphPanel extends mxGraphComponent {
 	private static final long serialVersionUID = -6686987563806502720L;
 
 	protected mxGraph graph;
-	protected mxFastOrganicLayout layout;
+	protected mxGraphLayout layout;
 	protected mxGraphModel model;
 	
 	
@@ -38,7 +39,8 @@ public class GraphPanel extends mxGraphComponent {
 			
 		// define layout
 	    layout = new mxFastOrganicLayout(graph);
-	    layout.setForceConstant(100); // the higher, the more separated
+//	    layout.setUseBoundingBox(false);
+//	    layout.setForceConstant(100); // the higher, the more separated
 //		layout.setDisableEdgeStyle(true); 
 //		layout.setMinDistanceLimit(100);
 //		layout.setMaxDistanceLimit(35);  
@@ -50,17 +52,15 @@ public class GraphPanel extends mxGraphComponent {
 		Map<String, Object> style_literal = new HashMap<String, Object>();
 		style_literal.put("shape", "rectangle");
 		style_literal.put("fontBold", true);
-//		style_literal.put("rounded", true);
-//		style_literal.put("fillColor", "#999999");
-//		style_literal.put("fontColor", "red");
 		smt_stylesheet.putCellStyle("literal", style_literal);
 		
 		Map<String, Object> style_node = new HashMap<String, Object>();
 		style_node.put("shape", "ellipse");
-//		style_node.put("fillColor", "#128949");
-//		style_node.put("fontColor", "black");
 		smt_stylesheet.putCellStyle("resource", style_node);
 
+		Map<String, Object> style_added = new HashMap<String, Object>();
+		style_added.put("fontColor", "green");
+		smt_stylesheet.putCellStyle("added", style_added);
 		
 		Map<String, Object> style_named_graph = new HashMap<String, Object>();
 		style_named_graph.put("fillColor", "white");

@@ -43,7 +43,6 @@ public class RuleGraphPanel extends GraphPanel {
 		Object g_cs = graph.insertVertex(graph.getDefaultParent(), "graph://CS", "graph://CS", 310, 5, 300, 500, "named_graph");
 		Object g_rhs = graph.insertVertex(graph.getDefaultParent(), "graph://RHS", "graph://RHS", 615, 5, 300, 500, "named_graph");
 		
-		
 		List<Update> list = upd.getOperations();
 		for (Update update : list) {
 			UpdateModify m = (UpdateModify) update;
@@ -56,18 +55,13 @@ public class RuleGraphPanel extends GraphPanel {
 		}
 		model.endUpdate();
 		
-		layout.execute(graph.getDefaultParent());
-		
 		layout.execute(g_lhs);
 		layout.execute(g_cs);
 		layout.execute(g_rhs);
-		
-		layout.execute(graph.getDefaultParent());
 	}
 	
 	
 	private void generateVisualisation_RHS(List<Quad> insertQuads, final String graph_c) {
-		// TODO Auto-generated method stub
 		for (Quad quad : insertQuads) {
 			Node g = quad.getGraph();
 			if (g.toString().equals(graph_c)){
@@ -85,14 +79,14 @@ public class RuleGraphPanel extends GraphPanel {
 								
 				if (sub==null){
 					String label = "+"+s.toString(pm);
-					sub = graph.insertVertex(gra, id_s, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "node");
+					sub = createVertex(gra, s,  label, "added");
 				}
 				if (obj==null){
 					String label = "+"+o.toString(pm);
-					obj = graph.insertVertex(gra, id_o, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "literal");
+					obj = createVertex(gra, o,  label, "added");
 				}
 				String label = "+"+p.toString(pm);
-				graph.insertEdge(gra, quad.toString(), label, sub, obj);	
+				graph.insertEdge(gra, quad.toString(), label, sub, obj, "added");	
 			}
 		}
 		layout.execute(graph.getDefaultParent());
@@ -147,14 +141,11 @@ public class RuleGraphPanel extends GraphPanel {
 				Object obj = model.getCell(o.toString());			
 				if (sub==null){
 					String label = s.toString(pm);
-					String id = s.toString();
-					sub = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "node");
+					sub = createVertex(parent, s,  label, "");
 				}
 				if (obj==null){
 					String label = o.toString(pm);
-					String id = o.toString();
-					obj = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "literal");
-					
+					obj = createVertex(parent, o,  label, "");
 				}
 				String label = p.toString(pm);
 				graph.insertEdge(parent, triplePath.toString(), label, sub, obj);
@@ -162,6 +153,24 @@ public class RuleGraphPanel extends GraphPanel {
 		}
 	}
 	
+	
+	/**
+	 * @param model
+	 * @param parent
+	 * @param node
+	 * @return
+	 */
+	private Object createVertex(final Object parent, Node node, String label, String style) {
+		Object sub;
+		String additional_style = (style!="") ? ";"+style : "";
+		
+		if (node.isLiteral())
+			sub = graph.insertVertex(parent, node.toString(), label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "literal" + additional_style);
+		else
+			sub = graph.insertVertex(parent, node.toString(), label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "resource" + additional_style);
+		graph.resizeCell(sub, graph.getPreferredSizeForCell(sub));
+		return sub;
+	}
 
 }
 

@@ -107,6 +107,7 @@ public class RDFGraphPanel extends GraphPanel {
 			sub = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "literal");
 		else
 			sub = graph.insertVertex(parent, id, label, 0, 0, NODE_WIDTH, NODE_HEIGHT, "resource");
+		graph.resizeCell(sub, graph.getPreferredSizeForCell(sub));
 		logger.debug("New Vertex: " + id + " (" + label +")");
 		return sub;
 	}

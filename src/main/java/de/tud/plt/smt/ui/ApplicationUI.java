@@ -111,8 +111,6 @@ public class ApplicationUI {
 		toolBar.add(b_load_rule);
 		JButton b_save_rule = new JButton("Save Rule");
 		toolBar.add(b_save_rule);
-		JButton b_clear_rule_canvas = new JButton("Clear Canvas");
-		toolBar.add(b_clear_rule_canvas);
 		JButton b_generate_operational_rules = new JButton("Generate Operational Rules");
 		toolBar.add(b_generate_operational_rules);
 		
@@ -194,8 +192,6 @@ public class ApplicationUI {
 		toolBar_btn_model.add(b_add_model);
 		JButton b_load_model = new JButton("Load Model");
 		toolBar_btn_model.add(b_load_model);
-		JButton b_clear = new JButton("Clear Canvas");
-		toolBar_btn_model.add(b_clear);
 		JButton b_save_model = new JButton("Save Model");
 		toolBar_btn_model.add(b_save_model);
 		
@@ -246,11 +242,6 @@ public class ApplicationUI {
 					e.printStackTrace();
 				}
 				
-			}
-		});
-		b_clear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				rdf_graph_panel.clear();
 			}
 		});
 		
