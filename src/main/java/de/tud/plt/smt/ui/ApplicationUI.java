@@ -36,6 +36,7 @@ import de.tud.plt.smt.controller.Controller;
 import de.tud.plt.smt.controller.DeclarativeRuleTransformator;
 import de.tud.plt.smt.model.Rule;
 import de.tud.plt.smt.model.TransformationModel;
+import sun.java2d.jules.JulesPathBuf;
 
 
 public class ApplicationUI {
@@ -57,9 +58,6 @@ public class ApplicationUI {
 	public JTree tree_model;
 	
 	public JTree tree_rules;
-
-
-
 	
 	/**
 	 * Create the application UI
@@ -88,11 +86,7 @@ public class ApplicationUI {
 		tree_rules.setEditable(true);
 		rule_tree_node = new DefaultMutableTreeNode("Rulesets");
 		tree_rules.setModel(new DefaultTreeModel(rule_tree_node));
-		
-		
-		
-		
-		
+
 		panel_rule.setLayout(new BorderLayout(0, 0));
 		
 		JPanel toolBar = new JPanel();
@@ -236,7 +230,11 @@ public class ApplicationUI {
 		b_save_model.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					controller.saveLHS("model_lhs.ttl");
+					JFileChooser chooser = new JFileChooser(path);
+				    int returnVal = chooser.showSaveDialog(null);
+				    if (returnVal == JFileChooser.APPROVE_OPTION) {
+				    	controller.saveModel(chooser.getSelectedFile());
+				    }
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

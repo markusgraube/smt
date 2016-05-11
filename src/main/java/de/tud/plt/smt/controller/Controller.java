@@ -1,6 +1,7 @@
 package de.tud.plt.smt.controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -71,19 +72,32 @@ public class Controller {
 		ds.addNamedModel(activeModel.cs_graphName, model.get_cs());
 		ds.addNamedModel(activeModel.rhs_graphName, model.get_rhs());
 		activeModel.pm = model.pm;
+		activeModel.jena_model = model.jena_model;
 		form.update_model_visualisation();		
 	}
 	
 	public void saveLHS(String path) throws IOException {
 		Model model = ds.getGraph("graph://LHS");
-		model.write( System.out, "TURTLE");
-		
 		File file = new File(path);
 		OutputStream out = new FileOutputStream(file);
 		model.write( out, "TURTLE");
 		out.close();
-		
-		logger.info("LHS model saved");
+	}
+	
+	public void saveRHS(String path) throws IOException {
+		Model model = ds.getGraph("graph://RHS");
+		File file = new File(path);
+		OutputStream out = new FileOutputStream(file);
+		model.write( out, "TURTLE");
+		out.close();
+	}
+	
+	public void saveCS(String path) throws IOException {
+		Model model = ds.getGraph("graph://CS");
+		File file = new File(path);
+		OutputStream out = new FileOutputStream(file);
+		model.write( out, "TURTLE");
+		out.close();
 	}
 
 
@@ -93,6 +107,18 @@ public class Controller {
 		ds.executeUpdateQuery(current_rule.transformationQuery);
 		logger.info("Sparql transformation performed");
 		form.update_model_visualisation();
+		
+	}
+
+
+	public void saveModel(File selectedFile) throws IOException {
+		OutputStream out = new FileOutputStream(selectedFile);
+		activeModel.jena_model.write( out, "TURTLE");
+		out.close();
+		saveLHS(selectedFile.getPath()+".lhs.ttl");
+		saveCS(selectedFile.getPath()+".cs.ttl");
+		saveRHS(selectedFile.getPath()+".rhs.ttl");
+		
 		
 	}
 	

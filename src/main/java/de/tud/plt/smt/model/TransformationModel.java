@@ -34,7 +34,7 @@ public class TransformationModel {
 	public String cs_graphName;
 	public String rhs_graphName;
 	
-	private Model jena_model;
+	public Model jena_model;
 	private DataSetInMemory dataset;
 	
 	public PrefixMapping pm;

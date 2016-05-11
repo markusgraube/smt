@@ -1,0 +1,15 @@
+[ <http://comvantage.eu/graph-trans/correspondence#c>
+          <http://comvantage.eu/graph-trans/class/i#c1> ;
+  <http://comvantage.eu/graph-trans/correspondence#c>
+          []  ;
+  <http://comvantage.eu/graph-trans/correspondence#columnPrefix>
+          ""
+] .
+
+[ <http://comvantage.eu/graph-trans/correspondence#c>
+          <http://comvantage.eu/graph-trans/class/i#c2> ;
+  <http://comvantage.eu/graph-trans/correspondence#c>
+          []  ;
+  <http://comvantage.eu/graph-trans/correspondence#columnPrefix>
+          ""
+] .

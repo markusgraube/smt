@@ -1,0 +1,33 @@
+@prefix ci:    <http://comvantage.eu/graph-trans/class/i#> .
+@prefix cm:    <http://comvantage.eu/graph-trans/class/m#> .
+
+ci:att2  a             cm:Attribute ;
+        cm:is_primary  true ;
+        cm:name        "name" ;
+        cm:type        ci:s .
+
+ci:c2   a                 cm:Class ;
+        cm:attrs          ci:att2 ;
+        cm:is_persistent  true ;
+        cm:name           "Customer" .
+
+ci:a1   a        cm:Association ;
+        cm:dest  ci:c2 ;
+        cm:name  "customer" ;
+        cm:src   ci:c1 .
+
+ci:att1  a             cm:Attribute ;
+        cm:is_primary  true ;
+        cm:name        "order_no" ;
+        cm:type        ci:i .
+
+ci:c1   a                 cm:Class ;
+        cm:attrs          ci:att1 ;
+        cm:is_persistent  true ;
+        cm:name           "Order" .
+
+ci:i    a        cm:PrimitiveDataType ;
+        cm:name  "int" .
+
+ci:s    a        cm:PrimitiveDataType ;
+        cm:name  "String" .
